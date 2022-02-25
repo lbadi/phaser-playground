@@ -10,7 +10,7 @@ export class Game extends Scene {
   private bombs!: Phaser.Physics.Arcade.Group;
   private playerAlive: boolean = false;
   private triggerTimer!: Phaser.Time.TimerEvent;
-  private playerId = 5;
+  private playerId = 2;
   constructor() {
     super({ key: "preloader" });
   }
@@ -57,7 +57,7 @@ export class Game extends Scene {
     this.triggerTimer = this.time.addEvent({
       callback: this.timerEvent,
       callbackScope: this,
-      delay: 400,
+      delay: 150,
       loop: true,
     });
     //Colliders
@@ -69,8 +69,7 @@ export class Game extends Scene {
       if(this.playerAlive) {
         return;
       }
-      this.player.enableBody(true, 400, 400, true, true);
-      
+      this.revivePlayer();
     };
     this.cursors.space.emitOnRepeat= false;
 
@@ -86,12 +85,6 @@ export class Game extends Scene {
     // this.physics.add.collider(stars, platforms);
     // this.physics.add.overlap(player, stars, collectStar, null, this);
     this.toogleWelcomeMessage(true);
-    this.scoreText = this.add
-      .text(400, 300, "Press enter to join", {
-        fontSize: "32px",
-        color: "#FFF",
-      })
-      .setOrigin(0.5, 0.5);
 
     //Score
     // this.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', color: '#000' });
@@ -130,6 +123,12 @@ export class Game extends Scene {
     if (this.cursors.up.isDown && this.player.body.touching.down) {
       this.player.setVelocityY(-580);
     }
+  }
+
+  revivePlayer() {
+    this.playerAlive = true;
+    this.player.enableBody(true, 400, 400, true, true);
+    this.toogleWelcomeMessage(false);
   }
 
   createPlayer() {
@@ -179,6 +178,7 @@ export class Game extends Scene {
   }
 
   toogleWelcomeMessage(toggle: boolean) {
+    console.log('Welcome message' + toggle);
     if (toggle) {
       this.scoreText = this.add
         .text(400, 300, "Press enter to join", {
@@ -187,6 +187,7 @@ export class Game extends Scene {
         })
         .setOrigin(0.5, 0.5);
     } else {
+      console.log('deactivate');
       this.scoreText.destroy();
     }
   }
@@ -220,9 +221,11 @@ export class Game extends Scene {
     this.add
       .sprite(this.player.body.x + 20, this.player.body.y + 20, "explosion")
       .play("explodeAnimation");
-    this.player.body.destroy();
     this.player.disableBody(true, true);
+    this.playerAlive = false;
     _bomb.destroy();
     this.gameOver = true;
+    this.toogleWelcomeMessage(true);
+
   };
 }
