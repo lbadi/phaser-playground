@@ -130,7 +130,7 @@ export class Game extends Scene {
       frameRate: 20,
       repeat: 0
     });
-    this.player.disableBody(true, true);
+    // this.player.disableBody(true, true);
   }
 
   toogleWelcomeMessage(toggle: boolean) {
