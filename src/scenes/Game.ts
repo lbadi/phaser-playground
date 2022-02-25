@@ -10,7 +10,7 @@ export class Game extends Scene {
   private bombs!: Phaser.Physics.Arcade.Group;
   private playerAlive: boolean = false;
   private triggerTimer!: Phaser.Time.TimerEvent;
-  private playerId = 1;
+  private playerId = 5;
   constructor() {
     super({ key: "preloader" });
   }
@@ -53,6 +53,12 @@ export class Game extends Scene {
       if (m.data.playerId != this.playerId) {
         this.throwBomb(this.foe, m.data.velocity, true);
       }
+    });
+    this.triggerTimer = this.time.addEvent({
+      callback: this.timerEvent,
+      callbackScope: this,
+      delay: 400,
+      loop: true,
     });
     //Colliders
     this.physics.add.collider(this.player, this.platforms);
