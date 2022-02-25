@@ -7,6 +7,7 @@ export class Game extends Scene {
   private scoreText!: GameObjects.Text;
   private gameOver!: boolean;
   private bombs!: Phaser.Physics.Arcade.Group;
+  private playerAlive: boolean = false;
   constructor() {
     super({ key: 'preloader' });
   }
@@ -36,38 +37,7 @@ export class Game extends Scene {
     this.platforms.create(750, 220, 'ground');
 
     //Player creation
-    this.player = this.physics.add.sprite(100, 450, 'dude');
-    this.foe = this.spawnFoe(400,200);
-
-    this.player.setBounce(0.2);
-    this.player.setCollideWorldBounds(true);
-
-    this.anims.create({
-      key: 'left',
-      frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: 'turn',
-      frames: [{ key: 'dude', frame: 4 }],
-      frameRate: 20
-    });
-
-    this.anims.create({
-      key: 'right',
-      frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-      frameRate: 10,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: 'explodeAnimation',
-      frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 31 }),
-      frameRate: 20,
-      repeat: 0
-    });
+    this.createPlayer();
 
     //Colliders
     this.physics.add.collider(this.player, this.platforms);
@@ -87,8 +57,11 @@ export class Game extends Scene {
     // });
     // this.physics.add.collider(stars, platforms);
     // this.physics.add.overlap(player, stars, collectStar, null, this);
+    this.toogleWelcomeMessage(true);
+    this.scoreText = this.add.text(400, 300, 'Press enter to join', { fontSize: '32px', color: '#FFF' }).setOrigin(0.5,0.5);
+
     //Score 
-    this.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', color: '#000' });
+    // this.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', color: '#000' });
 
     this.bombs = this.physics.add.group();
 
@@ -121,6 +94,50 @@ export class Game extends Scene {
 
     if (this.cursors.up.isDown && this.player.body.touching.down) {
       this.player.setVelocityY(-580);
+    }
+  }
+
+  createPlayer() {
+    this.player = this.physics.add.sprite(100, 450, 'dude');
+    this.foe = this.spawnFoe(400,200);
+
+    this.player.setBounce(0.2);
+    this.player.setCollideWorldBounds(true);
+
+    this.anims.create({
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+      frameRate: 10,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: 'turn',
+      frames: [{ key: 'dude', frame: 4 }],
+      frameRate: 20
+    });
+
+    this.anims.create({
+      key: 'right',
+      frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
+      frameRate: 10,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: 'explodeAnimation',
+      frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 31 }),
+      frameRate: 20,
+      repeat: 0
+    });
+    this.player.disableBody(true, true);
+  }
+
+  toogleWelcomeMessage(toggle: boolean) {
+    if(toggle) {
+      this.scoreText = this.add.text(400, 300, 'Press enter to join', { fontSize: '32px', color: '#FFF' }).setOrigin(0.5,0.5);
+    } else {
+      this.scoreText.destroy()
     }
   }
   
