@@ -65,7 +65,14 @@ export class Game extends Scene {
 
     //Controller
     this.cursors = this.input.keyboard.createCursorKeys();
-    this.cursors.space.emitOnRepeat = false;
+    this.input.keyboard.addKey('ENTER').onDown = (event) => {
+      if(this.playerAlive) {
+        return;
+      }
+      this.player.enableBody(true, 400, 400, true, true);
+      
+    };
+    this.cursors.space.emitOnRepeat= false;
 
     // stars = this.physics.add.group({
     //   key: 'star',
@@ -161,7 +168,8 @@ export class Game extends Scene {
       frameRate: 20,
       repeat: 0,
     });
-    // this.player.disableBody(true, true);
+    this.playerAlive=false;
+    this.player.disableBody(true, true);
   }
 
   public timerEvent(): void {
