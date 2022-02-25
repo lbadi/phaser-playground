@@ -1,5 +1,7 @@
 import { Scene, Physics, Types, GameObjects } from "phaser";
 import { PubSub } from "../pubsub";
+import GUN from "gun";
+
 export class Game extends Scene {
   private platforms: any;
   private player!: Physics.Arcade.Sprite;
@@ -32,6 +34,7 @@ export class Game extends Scene {
     });
   }
   async create() {
+    const gun = GUN(['https://gun-manhattan.herokuapp.com/gun']);
     console.log("create");
     this.add.image(400, 300, "sky");
     this.platforms = this.physics.add.staticGroup();
