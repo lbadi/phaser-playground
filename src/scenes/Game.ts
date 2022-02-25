@@ -1,6 +1,7 @@
 import { Scene, Physics, Types, GameObjects } from "phaser";
 import { PubSub } from "../pubsub";
 import GUN from "gun";
+import { IGunChainReference } from "gun/types/chain";
 
 export class Game extends Scene {
   private platforms: any;
@@ -13,8 +14,11 @@ export class Game extends Scene {
   private playerAlive: boolean = false;
   private triggerTimer!: Phaser.Time.TimerEvent;
   private playerId = 2;
+  private playerDataset;
   constructor() {
     super({ key: "preloader" });
+    const gun = GUN(['https://gun-manhattan.herokuapp.com/gun']);
+    this.playerDataset = gun.get('jorge-vs-devrepo')
   }
 
   async preload() {
@@ -34,7 +38,6 @@ export class Game extends Scene {
     });
   }
   async create() {
-    const gun = GUN(['https://gun-manhattan.herokuapp.com/gun']);
     console.log("create");
     this.add.image(400, 300, "sky");
     this.platforms = this.physics.add.staticGroup();
@@ -109,6 +112,16 @@ export class Game extends Scene {
       const velocity = this.player.body.velocity.x * 2;
       this.throwBomb(this.player, velocity);
     };
+    this.playerDataset.on((data) => {
+      Object.keys(data).forEach( playerId => {
+        if (!!+playerId && +playerId != this.playerId) {
+          const positions = JSON.parse(data[playerId])
+          this.foe.setPosition(positions.x, positions.y);
+        }
+      })
+      
+      console.log(data)
+    });
   }
 
   async update() {
@@ -175,13 +188,12 @@ export class Game extends Scene {
   }
 
   public timerEvent(): void {
-    PubSub.publish("channel", {
-      data: { x: this.player.x, y: this.player.y, playerId: this.playerId },
-    });
+    const data: any = {};
+    data[this.playerId] = JSON.stringify({ x: this.player.x, y: this.player.y });
+    this.playerDataset.put(data);
   }
 
   toogleWelcomeMessage(toggle: boolean) {
-    console.log('Welcome message' + toggle);
     if (toggle) {
       this.scoreText = this.add
         .text(400, 300, "Press enter to join", {
