@@ -63,6 +63,7 @@ export class Game extends Scene {
 
     //Controller
     this.cursors = this.input.keyboard.createCursorKeys();
+    this.cursors.space.emitOnRepeat= false;
 
     // stars = this.physics.add.group({
     //   key: 'star',
@@ -83,6 +84,11 @@ export class Game extends Scene {
     this.physics.add.collider(this.bombs, this.platforms);
 
     this.physics.add.collider(this.player, this.bombs, this.hitBomb, undefined, this);
+
+    this.cursors.space.onDown = (event) => {
+      console.log('key down');
+      this.throwBomb(this.player);
+    }
   }
 
   async update() {
@@ -117,12 +123,10 @@ export class Game extends Scene {
   }
 
   throwBomb(player: Physics.Arcade.Sprite) {
-    //var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-
-    var bomb = this.bombs.create(player.x, player.y, 'bomb');
-    bomb.setBounce(1);
+    var bomb = this.bombs.create(player.x, player.y - 30, 'bomb');
+    bomb.setBounce(0.9);
     bomb.setCollideWorldBounds(true);
-    bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+    bomb.setVelocity(player.body.velocity.x * 2, -600);
   }
   
   private hitBomb: ArcadePhysicsCallback = (_player, _bomb) => {
