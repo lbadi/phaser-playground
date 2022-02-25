@@ -21,6 +21,10 @@ export class Game extends Scene {
       'assets/dude.png',
       { frameWidth: 32, frameHeight: 48 }
     );
+    this.load.spritesheet('explosion',
+      'assets/explosion.png',
+      { frameWidth: 64, frameHeight: 64, endFrame: 23 }
+    );
   }
   async create() {
     console.log('create')
@@ -56,6 +60,13 @@ export class Game extends Scene {
       frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
       frameRate: 10,
       repeat: -1
+    });
+
+    this.anims.create({
+      key: 'explodeAnimation',
+      frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 31 }),
+      frameRate: 20,
+      repeat: 0
     });
 
     //Colliders
@@ -133,9 +144,11 @@ export class Game extends Scene {
     this.physics.pause();
 
     this.player.setTint(0xff0000);
-
     this.player.anims.play('turn');
-
+    this.add.sprite(this.player.body.x+20, this.player.body.y+20, 'explosion').play('explodeAnimation')
+    this.player.body.destroy()
+    this.player.disableBody(true,true);
+    _bomb.destroy();
     this.gameOver = true;
   }
 }
